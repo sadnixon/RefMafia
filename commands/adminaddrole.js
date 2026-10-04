@@ -39,7 +39,7 @@ const data = new SlashCommandBuilder()
     option
       .setName('itanumber')
       .setDescription('How many ITAs per day this role will have')
-      .setRequired(true)
+      .setRequired(false)
       .setMinValue(0)
       .setMaxValue(100),
   )
@@ -47,7 +47,7 @@ const data = new SlashCommandBuilder()
     option
       .setName('itasuccess')
       .setDescription('What % chance the ITA has of working')
-      .setRequired(true)
+      .setRequired(false)
       .setMinValue(0)
       .setMaxValue(100),
   );
@@ -65,8 +65,8 @@ async function execute(interaction, user) {
 
   const role = interaction.options.getString('role');
   const team = interaction.options.getString('team');
-  const itanumber = interaction.options.getInteger('itanumber');
-  const itasuccess = interaction.options.getInteger('itasuccess');
+  const itanumber = interaction.options.getInteger('itanumber') ?? 1;
+  const itasuccess = interaction.options.getInteger('itasuccess') ?? 15;
 
   rolePool[role] = {
     role: role,
