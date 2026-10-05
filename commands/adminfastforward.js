@@ -1,6 +1,16 @@
 'use strict';
 
 const { SlashCommandBuilder } = require('discord.js');
+const { scheduleInXHours, clearTasks } = require('../scheduler');
+const {
+  shuffleArray,
+  sendGameState,
+  standardEmbed,
+} = require('../message-helpers');
+const {
+  scheduleInXHours,
+  clearTasks,
+} = require('../scheduler');
 
 const data = new SlashCommandBuilder()
   .setName('adminfastforward')
@@ -48,7 +58,9 @@ async function execute(interaction, user) {
       .map((e) => e.id)) {
       await clearMessages(id);
       console.log(id);
-      const member = await interaction.guild.members.fetch(id).catch(() => null);
+      const member = await interaction.guild.members
+        .fetch(id)
+        .catch(() => null);
       console.log(id, member ? 'found' : 'NOT IN GUILD');
       if (!member) continue;
       await genChannel.permissionOverwrites.edit(id, {
@@ -105,6 +117,14 @@ async function execute(interaction, user) {
     gameState = await gameInfo.get('gameState');
     gameState.currentState = 'Night';
 
+    let cDayChats = {};
+
+    for (const id of gameState.players.map((e) => e.id)) {
+      cDayChats[id] =
+        (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    }
+    gameState.dayChats[gameState.dayIndex] = cDayChats;
+
     await gameInfo.set('gameState', gameState);
 
     await killPlayer(interaction.client, targetUser);
@@ -126,7 +146,9 @@ async function execute(interaction, user) {
       console.log(currentPlayers);
       for (const id of currentPlayers) {
         console.log(id);
-        const member = await interaction.guild.members.fetch(id).catch(() => null);
+        const member = await interaction.guild.members
+          .fetch(id)
+          .catch(() => null);
         console.log(id, member ? 'found' : 'NOT IN GUILD');
         if (!member) continue;
         await genChannel.permissionOverwrites.edit(id, {

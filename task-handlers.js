@@ -53,6 +53,14 @@ function initializeTaskHandlers(discordClient) {
       gameState = await gameInfo.get('gameState');
       gameState.currentState = 'Night';
 
+      let cDayChats = {};
+
+      for (const id of gameState.players.map((e) => e.id)) {
+        cDayChats[id] =
+          (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+      }
+      gameState.dayChats[gameState.dayIndex] = cDayChats;
+
       await gameInfo.set('gameState', gameState);
 
       await killPlayer(client, mostVotesPlayer);
@@ -156,6 +164,14 @@ function initializeTaskHandlers(discordClient) {
 
     gameState = await gameInfo.get('gameState');
     gameState.currentState = 'Night';
+
+    let cDayChats = {};
+
+    for (const id of gameState.players.map((e) => e.id)) {
+      cDayChats[id] =
+        (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    }
+    gameState.dayChats[gameState.dayIndex] = cDayChats;
 
     await gameInfo.set('gameState', gameState);
 

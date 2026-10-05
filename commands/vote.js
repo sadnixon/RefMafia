@@ -84,6 +84,12 @@ async function execute(interaction, user) {
       `**<@${interaction.user.id}> voted to execute <@${targetUser}>!**`,
     ),
   );
+  await genChannel.send(
+    standardEmbed(
+      'A vote has been made!',
+      `**<@${interaction.user.id}> voted to execute <@${targetUser}>!**`,
+    ),
+  );
   await interaction.editReply({
     content: `You made a vote!`,
     ephemeral: true,
@@ -102,6 +108,14 @@ async function execute(interaction, user) {
     await clearTasks();
     gameState = await gameInfo.get('gameState');
     gameState.currentState = 'Night';
+
+    let cDayChats = {};
+
+    for (const id of gameState.players.map((e) => e.id)) {
+      cDayChats[id] =
+        (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    }
+    gameState.dayChats[gameState.dayIndex] = cDayChats;
 
     await gameInfo.set('gameState', gameState);
 

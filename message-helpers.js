@@ -281,6 +281,7 @@ async function startGame(interaction) {
     ],
     dayExecuted: [],
     dayITAs: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
+    dayChats: [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
     chatLimit: 1000,
     currentState: 'DaySupermaj',
     dayIndex: 0,
@@ -337,9 +338,16 @@ async function sendGameState(
 
   const embedColor = reveal && winner !== 'none' ? winner : 'Neutral';
 
+  let cDayChats = {};
+
+  for (const id of gameState.players.map((e) => e.id)) {
+    cDayChats[id] =
+      (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+  }
+
   const embed = standardEmbed(
     'Current Game State:',
-    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}`,
+    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}`,
     embedColor,
   );
 
@@ -372,12 +380,23 @@ async function sendVoteState(
     dayIndex = gameState.dayIndex;
   }
 
-  const cDayVoteOptions = [...new Set(gameState.dayVotes[dayIndex].filter((e) => e !== null))]; 
+  const cDayVoteOptions = [
+    ...new Set(gameState.dayVotes[dayIndex].filter((e) => e !== null)),
+  ];
   const cDayVotes = gameState.dayVotes[dayIndex];
+  let cDayChats = {};
+
+  if (dayIndex === gameState.dayIndex) {
+    for (const id of gameState.players.map((e) => e.id)) {
+      cDayChats[id] =
+        (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    }
+  } else {
+    cDayChats = gameState.dayChats[dayIndex];
+  }
 
   let resultText = '';
   if (gameState.dayExecuted[dayIndex]) {
-
     resultText = `\n\n**<@${gameState.dayExecuted[dayIndex]}> was executed!**`;
   }
 
@@ -388,11 +407,11 @@ async function sendVoteState(
   };
 
   const embed = standardEmbed(
-    `Current M${dayIndex + 1} Vote State`,
+    `Current Day ${dayIndex + 1} Vote State`,
     `${cDayVoteOptions
       .map(
         (e) =>
-          `**<@${e}> to be executed**\n${optionVotes(e).length} Votes: ${optionVotes(
+          `**<@${e}> (${cDayChats[e]}) to be executed**\n${optionVotes(e).length} Votes: ${optionVotes(
             e,
           )
             .map((e1) => `<@${e1}>`)
@@ -419,7 +438,7 @@ async function killPlayer(client, targetUser) {
   await announceChannel.send(
     `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}>, who has been executed!`,
   );
-  
+
   const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
   gameState.players[playerIndex].alive = false;
 
@@ -542,22 +561,19 @@ async function endGame(client) {
   ).length;
 
   let winningTeam;
-  if (
-    mafiaAlive >= leftAlive / 2
-  ) {
+  if (mafiaAlive >= leftAlive / 2) {
     await announceChannel.send(
       `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# THE MAFIA WIN!`,
     );
     winningTeam = 'Mafia';
-  } else if (
-    mafiaAlive === 0
-  ) {
+  } else if (mafiaAlive === 0) {
     await announceChannel.send(
       `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# THE TOWN WIN!`,
     );
     winningTeam = 'Town';
   }
   gameState.endTime = Date.now();
+  gameState.currentState = 'GameOver';
   await gameInfo.set('gameState', gameState);
   await gameHistory.set(gameState.gameId, gameState);
   await gameInfo.set('inPlay', false);

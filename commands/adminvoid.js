@@ -35,6 +35,10 @@ const data = new SlashCommandBuilder()
           name: 'Back To Ready',
           value: 'back',
         },
+        {
+          name: 'Special',
+          value: 'special',
+        },
       ),
   );
 
@@ -73,6 +77,26 @@ async function execute(interaction, user) {
     await schedDB.clear();
     const gameState = await gameInfo.get('gameState');
     gameState.phaseTimers = [];
+    await gameInfo.set('gameState', gameState);
+  } else if (voidType === 'special') {
+    const gameState = await gameInfo.get('gameState');
+    gameState.dayChats = [
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+    ];
     await gameInfo.set('gameState', gameState);
   }
 
