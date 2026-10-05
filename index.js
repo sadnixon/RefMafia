@@ -30,7 +30,7 @@ const { startScheduler } = require('./scheduler');
 
 const { initializeTaskHandlers } = require('./task-handlers');
 
-const { countMessage } = require('./talkstate');
+const { countMessage, setTalkConfig } = require('./talkstate');
 
 // -----------------------------------------------------------------------------
 // Sentry
