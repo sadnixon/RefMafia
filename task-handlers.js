@@ -32,6 +32,7 @@ function initializeTaskHandlers(discordClient) {
     const genChannel = await guild.channels.fetch(
       gameChannels['general'].channelId,
     );
+    const currentPlayers = await gameInfo.get('players');
 
     let mostVotes = 0;
     let mostVotesPlayer;
