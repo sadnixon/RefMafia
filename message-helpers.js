@@ -415,6 +415,7 @@ async function sendVoteState(
   const embed = standardEmbed(
     `Current Day ${dayIndex + 1} Vote State`,
     `${cDayVoteOptions
+      .sort((a, b) => optionVotes(b).length - optionVotes(a).length)
       .map(
         (e) =>
           `**${e === 'Sleep' ? 'GO TO SLEEP' : `<@${e}> (${cDayChats[e]}) to be executed`}**\n${optionVotes(e).length} Votes: ${optionVotes(
@@ -423,7 +424,6 @@ async function sendVoteState(
             .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
             .join(', ')}`,
       )
-      .sort((a, b) => optionVotes(b).length - optionVotes(a).length)
       .join('\n\n')}\n\nNot Voted: ${optionVotes(null)
       .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
       .join(', ')}${resultText}`,
