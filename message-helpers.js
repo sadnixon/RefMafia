@@ -348,7 +348,7 @@ async function sendGameState(
 
   const embed = standardEmbed(
     'Current Game State:',
-    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : 'ITAs Deactivated'}`,
+    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
     embedColor,
   );
 
