@@ -45,14 +45,10 @@ async function execute(interaction, user) {
     gameState?.players?.findIndex((e) => e.id === interaction.user.id) ?? -1;
   if (
     !gameOngoing ||
-    !['DaySupermaj', 'Day'].includes(gameState.currentState) ||
+    !gameState.itaActive ||
     gameState.dayIndex === 0 ||
     !currentPlayers.includes(interaction.user.id) ||
     gameState.players[playerIndex].alive === false ||
-    (gameState.currentState === 'Day' &&
-      Date.now() >= gameState.phaseTimers[0].timeStamp - 60 * 60 * 1000) ||
-    (gameState.currentState === 'DaySupermaj' &&
-      Date.now() <= gameState.phaseTimers[0].timeStamp - 5 * 60 * 60 * 1000) ||
     gameState.dayITAs[gameState.dayIndex].filter(
       (e) => e.id === interaction.user.id,
     ).length >= rolePool[gameState.players[playerIndex].role].itanumber

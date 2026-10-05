@@ -17,6 +17,7 @@ const {
   clearTasks,
   scheduleInXHours,
   scheduleInXSeconds,
+  scheduleTask,
 } = require('../scheduler');
 
 const data = new SlashCommandBuilder()
@@ -112,6 +113,7 @@ async function execute(interaction, user) {
     gameState.dayVotes[gameState.dayIndex].filter((e) => e === targetUser)
       .length >= voteMaj
   ) {
+    const itaTimer = gameState.phaseTimers[1]?.timeStamp ?? null;
     await clearTasks();
     gameState = await gameInfo.get('gameState');
     gameState.currentState = 'Night';
@@ -123,12 +125,11 @@ async function execute(interaction, user) {
         (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
     }
     gameState.dayChats[gameState.dayIndex] = cDayChats;
+    gameState.dayExecuted.push(targetUser);
 
     await gameInfo.set('gameState', gameState);
 
     await killPlayer(interaction.client, targetUser);
-
-    gameState.dayExecuted.push(targetUser);
 
     gameState = await gameInfo.get('gameState');
 
@@ -139,6 +140,11 @@ async function execute(interaction, user) {
 
     if (mafiaAlive < leftAlive / 2 && mafiaAlive > 0) {
       await scheduleInXHours('end_night', {}, 12);
+      if (gameState.itaActive && itaTimer != null) {
+        await scheduleTask('deactivate_ita', {}, itaTimer);
+      } else if (itaTimer != null) {
+        await scheduleTask('activate_ita', {}, itaTimer);
+      }
       await sendGameState(interaction.client);
       await genChannel.send(
         standardEmbed('The night has fallen...', `Sleep tight, town.`),
@@ -163,7 +169,7 @@ async function execute(interaction, user) {
           [PermissionFlagsBits.SendMessages]: false,
         });
         await nongameChannel.permissionOverwrites.edit(id, {
-          [PermissionFlagsBits.SendMessages]: true,
+          [PermissionFlagsBits.SendMessages]: false,
         });
         await pickChannel.permissionOverwrites.edit(id, {
           [PermissionFlagsBits.SendMessages]: false,

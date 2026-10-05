@@ -281,6 +281,7 @@ async function startGame(interaction) {
     ],
     dayExecuted: [],
     dayITAs: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
+    itaActive: false,
     dayChats: [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
     chatLimit: 1000,
     currentState: 'DaySupermaj',
@@ -347,7 +348,7 @@ async function sendGameState(
 
   const embed = standardEmbed(
     'Current Game State:',
-    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}`,
+    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : 'ITAs Deactivated'}`,
     embedColor,
   );
 
@@ -396,7 +397,12 @@ async function sendVoteState(
   }
 
   let resultText = '';
-  if (gameState.dayExecuted[dayIndex]) {
+  if (
+    gameState.dayExecuted[dayIndex] &&
+    gameState.dayExecuted[dayIndex] === 'Sleep'
+  ) {
+    resultText = `\n\n**The town went to sleep and no one was executed!**`;
+  } else if (gameState.dayExecuted[dayIndex]) {
     resultText = `\n\n**<@${gameState.dayExecuted[dayIndex]}> (${cDayChats[gameState.dayExecuted[dayIndex]]}) was executed!**`;
   }
 
@@ -411,12 +417,13 @@ async function sendVoteState(
     `${cDayVoteOptions
       .map(
         (e) =>
-          `**<@${e}> (${cDayChats[e]}) to be executed**\n${optionVotes(e).length} Votes: ${optionVotes(
+          `**${e === 'Sleep' ? 'GO TO SLEEP' : `<@${e}> (${cDayChats[e]}) to be executed`}**\n${optionVotes(e).length} Votes: ${optionVotes(
             e,
           )
             .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
             .join(', ')}`,
       )
+      .sort((a, b) => optionVotes(b).length - optionVotes(a).length)
       .join('\n\n')}\n\nNot Voted: ${optionVotes(null)
       .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
       .join(', ')}${resultText}`,
@@ -436,9 +443,7 @@ async function killPlayer(client, targetUser) {
   const currentPlayers = await gameInfo.get('players');
 
   const killedChats =
-    (await chatCounts.get(
-      `talkCount:${gameState.guildId}:${targetUser}`,
-    )) ?? 0;
+    (await chatCounts.get(`talkCount:${gameState.guildId}:${targetUser}`)) ?? 0;
 
   await announceChannel.send(
     `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}> (${killedChats}), who has been executed!`,

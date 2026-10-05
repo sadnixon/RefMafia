@@ -1,7 +1,7 @@
 'use strict';
 
 const { SlashCommandBuilder } = require('discord.js');
-const { scheduleInXHours, clearTasks } = require('../scheduler');
+const { scheduleInXHours, scheduleTask, clearTasks } = require('../scheduler');
 const {
   shuffleArray,
   sendGameState,
@@ -79,16 +79,18 @@ async function execute(interaction, user) {
     await gameInfo.set('gameState', gameState);
 
     await scheduleInXHours('end_supermaj', {}, 6);
+    await scheduleInXHours('activate_ita', {}, 1);
     await sendGameState(interaction.client);
     await genChannel.send(
       `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nAwaken town, for the sun has risen!`,
     );
   } else {
+    const itaTimer = gameState.phaseTimers[1]?.timeStamp ?? null;
     await clearTasks();
 
     let mostVotes = 0;
     let mostVotesPlayers = [];
-    for (const player of currentPlayers) {
+    for (const player of [...currentPlayers, 'Sleep']) {
       const voteCount = gameState.dayVotes[gameState.dayIndex].filter(
         (e) => e === player,
       ).length;
@@ -104,7 +106,7 @@ async function execute(interaction, user) {
       await pickChannel.send(
         standardEmbed(
           'There is a tie in execution votes!',
-          `RNG will determine the executed player between ${mostVotesPlayers.map((e) => `<@${e.id}>`).join(', ')}.`,
+          `RNG will determine between ${mostVotesPlayers.map((e) => (e === 'Sleep' ? 'SLEEP' : `<@${e}>`)).join(', ')}.`,
         ),
       );
     }
@@ -120,10 +122,21 @@ async function execute(interaction, user) {
         (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
     }
     gameState.dayChats[gameState.dayIndex] = cDayChats;
+    gameState.dayExecuted.push(targetUser);
 
     await gameInfo.set('gameState', gameState);
 
-    await killPlayer(interaction.client, targetUser);
+    if (targetUser === 'Sleep') {
+      const announceChannel = await interaction.guild.channels.fetch(
+        gameChannels['announcements'].channelId,
+      );
+
+      await announceChannel.send(
+        `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
+      );
+    } else {
+      await killPlayer(interaction.client, targetUser);
+    }
 
     gameState = await gameInfo.get('gameState');
 
@@ -134,6 +147,11 @@ async function execute(interaction, user) {
 
     if (mafiaAlive < leftAlive / 2 && mafiaAlive > 0) {
       await scheduleInXHours('end_night', {}, 12);
+      if (gameState.itaActive && itaTimer != null) {
+        await scheduleTask('deactivate_ita', {}, itaTimer);
+      } else if (itaTimer != null) {
+        await scheduleTask('activate_ita', {}, itaTimer);
+      }
       await sendGameState(interaction.client);
       await genChannel.send(
         standardEmbed('The night has fallen...', `Sleep tight, town.`),

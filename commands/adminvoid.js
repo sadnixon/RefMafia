@@ -80,23 +80,7 @@ async function execute(interaction, user) {
     await gameInfo.set('gameState', gameState);
   } else if (voidType === 'special') {
     const gameState = await gameInfo.get('gameState');
-    gameState.dayChats = [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-    ];
+    gameState.itaActive = false;
     await gameInfo.set('gameState', gameState);
   }
 

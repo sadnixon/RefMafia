@@ -9,13 +9,10 @@ const {
 const { killPlayer } = require('../message-helpers');
 
 const data = new SlashCommandBuilder()
-  .setName('forceascend')
-  .setDescription('Force a player to Ascend')
+  .setName('forceflip')
+  .setDescription('Force a player to flip')
   .addUserOption((option) =>
-    option
-      .setName('user')
-      .setDescription('The user to ascend')
-      .setRequired(true),
+    option.setName('user').setDescription('The user to flip').setRequired(true),
   );
 
 async function execute(interaction, user) {
@@ -39,18 +36,21 @@ async function execute(interaction, user) {
 
   if (!gameOngoing || !currentPlayers.includes(targetUser)) {
     await interaction.editReply({
-      content: `What if YOU tried to send someone to HEAVEN but SadNixon said "NO"`,
+      content: `What if YOU tried to FLIP someone but SadNixon said "NO"`,
       ephemeral: true,
     });
     return;
   }
 
+  const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
+  gameState.players[playerIndex].flipped = true;
+
+  await gameInfo.set('gameState', gameState);
+
   await interaction.editReply({
-    content: `They're getting ascended!`,
+    content: `They're getting flipped!`,
     ephemeral: true,
   });
-
-  await killPlayer(interaction.client, targetUser);
 }
 
 module.exports = {
