@@ -78,16 +78,23 @@ async function execute(interaction, user) {
 
   await gameInfo.set('gameState', gameState);
 
+  const voterChats =
+    (await chatCounts.get(
+      `talkCount:${gameState.guildId}:${interaction.user.id}`,
+    )) ?? 0;
+  const votedChats =
+    (await chatCounts.get(`talkCount:${gameState.guildId}:${targetUser}`)) ?? 0;
+
   await pickChannel.send(
     standardEmbed(
       'A vote has been made!',
-      `**<@${interaction.user.id}> voted to execute <@${targetUser}>!**`,
+      `**<@${interaction.user.id}> (${voterChats}) voted to execute <@${targetUser}> (${votedChats}) !**`,
     ),
   );
   await genChannel.send(
     standardEmbed(
       'A vote has been made!',
-      `**<@${interaction.user.id}> voted to execute <@${targetUser}>!**`,
+      `**<@${interaction.user.id}> (${voterChats}) voted to execute <@${targetUser}> (${votedChats}) !**`,
     ),
   );
   await interaction.editReply({

@@ -347,7 +347,7 @@ async function sendGameState(
 
   const embed = standardEmbed(
     'Current Game State:',
-    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}`,
+    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}`,
     embedColor,
   );
 
@@ -397,7 +397,7 @@ async function sendVoteState(
 
   let resultText = '';
   if (gameState.dayExecuted[dayIndex]) {
-    resultText = `\n\n**<@${gameState.dayExecuted[dayIndex]}> was executed!**`;
+    resultText = `\n\n**<@${gameState.dayExecuted[dayIndex]}> (${cDayChats[gameState.dayExecuted[dayIndex]]}) was executed!**`;
   }
 
   const optionVotes = (option) => {
@@ -414,11 +414,11 @@ async function sendVoteState(
           `**<@${e}> (${cDayChats[e]}) to be executed**\n${optionVotes(e).length} Votes: ${optionVotes(
             e,
           )
-            .map((e1) => `<@${e1}>`)
+            .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
             .join(', ')}`,
       )
       .join('\n\n')}\n\nNot Voted: ${optionVotes(null)
-      .map((e1) => `<@${e1}>`)
+      .map((e1) => `<@${e1}> (${cDayChats[e1]})`)
       .join(', ')}${resultText}`,
   );
 
@@ -435,8 +435,13 @@ async function killPlayer(client, targetUser) {
   );
   const currentPlayers = await gameInfo.get('players');
 
+  const killedChats =
+    (await chatCounts.get(
+      `talkCount:${gameState.guildId}:${targetUser}`,
+    )) ?? 0;
+
   await announceChannel.send(
-    `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}>, who has been executed!`,
+    `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
   );
 
   const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
