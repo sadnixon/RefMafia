@@ -329,6 +329,15 @@ function initializeTaskHandlers(discordClient) {
     gameState.phaseTimers = gameState.phaseTimers.slice(0, -1);
     await gameInfo.set('gameState', gameState);
     await scheduleInXHours('deactivate_ita', {}, 10);
+
+    const guild = await client.guilds.fetch(gameState.guildId);
+    const gameChannels = await gameInfo.get('game_channels');
+    const genChannel = await guild.channels.fetch(
+      gameChannels['general'].channelId,
+    );
+    await genChannel.send(
+      standardEmbed('Attention Everyone!', 'ITAs are now activated.'),
+    );
   });
 
   registerHandler('deactivate_ita', async (data) => {
@@ -336,6 +345,15 @@ function initializeTaskHandlers(discordClient) {
     gameState.itaActive = false;
     gameState.phaseTimers = gameState.phaseTimers.slice(0, -1);
     await gameInfo.set('gameState', gameState);
+
+    const guild = await client.guilds.fetch(gameState.guildId);
+    const gameChannels = await gameInfo.get('game_channels');
+    const genChannel = await guild.channels.fetch(
+      gameChannels['general'].channelId,
+    );
+    await genChannel.send(
+      standardEmbed('Attention Everyone!', 'ITAs are now deactivated.'),
+    );
   });
 }
 
