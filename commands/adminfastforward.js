@@ -7,10 +7,6 @@ const {
   sendGameState,
   standardEmbed,
 } = require('../message-helpers');
-const {
-  scheduleInXHours,
-  clearTasks,
-} = require('../scheduler');
 
 const data = new SlashCommandBuilder()
   .setName('adminfastforward')
