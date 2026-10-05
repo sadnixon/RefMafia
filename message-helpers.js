@@ -491,9 +491,7 @@ async function killPlayer(client, targetUser) {
     [PermissionFlagsBits.ReadMessageHistory]: true,
   });
   await spiesChannel.permissionOverwrites.edit(targetUser, {
-    [PermissionFlagsBits.ViewChannel]: true,
     [PermissionFlagsBits.SendMessages]: false,
-    [PermissionFlagsBits.ReadMessageHistory]: true,
   });
 
   //Final check
