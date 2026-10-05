@@ -42,9 +42,9 @@ async function execute(interaction, user) {
   const nongameChannel = await interaction.guild.channels.fetch(
     gameChannels['nongame'].channelId,
   );
-  const paragraphsChannel = await interaction.guild.channels.fetch(
-    gameChannels['paragraphs'].channelId,
-  );
+  //const paragraphsChannel = await interaction.guild.channels.fetch(
+  //  gameChannels['paragraphs'].channelId,
+  //);
 
   if (gameState.currentPhase === 'Night') {
     await clearTasks();
@@ -68,9 +68,9 @@ async function execute(interaction, user) {
       await pickChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
-      await paragraphsChannel.permissionOverwrites.edit(id, {
-        [PermissionFlagsBits.SendMessages]: true,
-      });
+      //await paragraphsChannel.permissionOverwrites.edit(id, {
+      //  [PermissionFlagsBits.SendMessages]: true,
+      //});
     }
 
     gameState.currentState = 'DaySupermaj';

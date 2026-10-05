@@ -131,9 +131,9 @@ async function execute(interaction, user) {
     const nongameChannel = await interaction.guild.channels.fetch(
       gameChannels['nongame'].channelId,
     );
-    const paragraphsChannel = await interaction.guild.channels.fetch(
-      gameChannels['paragraphs'].channelId,
-    );
+    //const paragraphsChannel = await interaction.guild.channels.fetch(
+    //  gameChannels['paragraphs'].channelId,
+    //);
 
     console.log(currentPlayers);
     for (const id of currentPlayers) {
@@ -152,9 +152,9 @@ async function execute(interaction, user) {
       await pickChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: false,
       });
-      await paragraphsChannel.permissionOverwrites.edit(id, {
-        [PermissionFlagsBits.SendMessages]: false,
-      });
+      //await paragraphsChannel.permissionOverwrites.edit(id, {
+      //  [PermissionFlagsBits.SendMessages]: false,
+      //});
     }
   }
 }
