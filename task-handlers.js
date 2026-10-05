@@ -7,6 +7,7 @@ const {
   standardEmbed,
   endGame,
   randomNumber,
+  killPlayer,
 } = require('./message-helpers');
 const {
   registerHandler,
@@ -17,6 +18,7 @@ const {
 } = require('./scheduler');
 const { clearMessages } = require('./talkstate');
 const _ = require('lodash');
+const { PermissionFlagsBits } = require('discord.js');
 
 let client;
 
@@ -64,11 +66,11 @@ function initializeTaskHandlers(discordClient) {
           (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
       }
       gameState.dayChats[gameState.dayIndex] = cDayChats;
-      gameState.dayExecuted.push(targetUser);
+      gameState.dayExecuted.push(mostVotesPlayer);
 
       await gameInfo.set('gameState', gameState);
 
-      if (targetUser === 'Sleep') {
+      if (mostVotesPlayer === 'Sleep') {
         const announceChannel = await guild.channels.fetch(
           gameChannels['announcements'].channelId,
         );
@@ -77,7 +79,7 @@ function initializeTaskHandlers(discordClient) {
           `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
         );
       } else {
-        await killPlayer(client, targetUser);
+        await killPlayer(client, mostVotesPlayer);
       }
 
       gameState = await gameInfo.get('gameState');
