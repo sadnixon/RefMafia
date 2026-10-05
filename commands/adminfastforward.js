@@ -8,6 +8,7 @@ const {
   standardEmbed,
   killPlayer,
 } = require('../message-helpers');
+const { setTalkConfig, clearMessages } = require('./talkstate');
 
 const data = new SlashCommandBuilder()
   .setName('adminfastforward')
