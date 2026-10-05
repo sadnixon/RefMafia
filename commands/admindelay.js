@@ -40,9 +40,9 @@ async function execute(interaction, user) {
 
   await clearTasks();
 
-  if (gameState.currentPhase === 'Night') {
+  if (gameState.currentState === 'Night') {
     await scheduleInXHours('end_night', {}, hours);
-  } else if (gameState.currentPhase === 'Day') {
+  } else if (gameState.currentState === 'Day') {
     await scheduleInXHours('end_day', {}, hours);
   } else {
     await scheduleInXHours('end_supermaj', {}, hours);

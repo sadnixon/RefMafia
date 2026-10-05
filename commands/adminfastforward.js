@@ -47,7 +47,7 @@ async function execute(interaction, user) {
     gameChannels['paragraphs'].channelId,
   );
 
-  if (gameState.currentPhase === 'Night') {
+  if (gameState.currentState === 'Night') {
     await clearTasks();
 
     for (const id of gameState.players
