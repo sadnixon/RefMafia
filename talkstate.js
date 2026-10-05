@@ -1,3 +1,7 @@
+const {
+  PermissionFlagsBits,
+} = require('discord.js');
+
 let talkConfig = null;
 
 function getTalkConfig() {

@@ -1,11 +1,12 @@
 'use strict';
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { scheduleInXHours, scheduleTask, clearTasks } = require('../scheduler');
 const {
   shuffleArray,
   sendGameState,
   standardEmbed,
+  killPlayer,
 } = require('../message-helpers');
 
 const data = new SlashCommandBuilder()
