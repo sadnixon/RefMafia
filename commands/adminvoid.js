@@ -1,6 +1,7 @@
 'use strict';
 
 const { SlashCommandBuilder } = require('discord.js');
+const { setTalkConfig, clearMessages } = require('../talkstate');
 
 const data = new SlashCommandBuilder()
   .setName('adminvoid')
@@ -38,6 +39,10 @@ const data = new SlashCommandBuilder()
         {
           name: 'Special',
           value: 'special',
+        },
+        {
+          name: 'Chats',
+          value: 'chats',
         },
       ),
   );
@@ -82,6 +87,13 @@ async function execute(interaction, user) {
     const gameState = await gameInfo.get('gameState');
     gameState.itaActive = false;
     await gameInfo.set('gameState', gameState);
+  } else if (voidType === 'chats') {
+    const gameState = await gameInfo.get('gameState');
+    for (const id of gameState.players
+      .filter((e) => e.alive)
+      .map((e) => e.id)) {
+      await clearMessages(id);
+    }
   }
 
   await interaction.editReply({

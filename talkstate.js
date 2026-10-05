@@ -1,6 +1,4 @@
-const {
-  PermissionFlagsBits,
-} = require('discord.js');
+const { PermissionFlagsBits } = require('discord.js');
 
 let talkConfig = null;
 
@@ -67,7 +65,7 @@ async function countMessage(message) {
 }
 
 async function clearMessages(id) {
-  const gameState = gameInfo.get('gameState');
+  const gameState = await gameInfo.get('gameState');
 
   const key = `talkCount:${gameState.guildId}:${id}`;
 
