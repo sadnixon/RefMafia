@@ -270,9 +270,9 @@ function initializeTaskHandlers(discordClient) {
     const nongameChannel = await guild.channels.fetch(
       gameChannels['nongame'].channelId,
     );
-    //const paragraphsChannel = await guild.channels.fetch(
-    //  gameChannels['paragraphs'].channelId,
-    //);
+    const paragraphsChannel = await guild.channels.fetch(
+      gameChannels['paragraphs'].channelId,
+    );
 
     if (gameState.currentState === 'adminPaused') {
       await genChannel.send(
@@ -303,9 +303,9 @@ function initializeTaskHandlers(discordClient) {
       await pickChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
-      //await paragraphsChannel.permissionOverwrites.edit(id, {
-      //  [PermissionFlagsBits.SendMessages]: true,
-      //});
+      await paragraphsChannel.permissionOverwrites.edit(id, {
+        [PermissionFlagsBits.SendMessages]: true,
+      });
     }
 
     gameState.currentState = 'DaySupermaj';
