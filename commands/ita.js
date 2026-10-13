@@ -43,6 +43,7 @@ async function execute(interaction, user) {
   const currentPlayers = await gameInfo.get('players');
   const playerIndex =
     gameState?.players?.findIndex((e) => e.id === interaction.user.id) ?? -1;
+  const rolePool = await gameInfo.get('rolePool');
   if (
     !gameOngoing ||
     //!gameState.itaActive ||
