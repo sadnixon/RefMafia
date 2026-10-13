@@ -45,8 +45,8 @@ async function execute(interaction, user) {
     gameState?.players?.findIndex((e) => e.id === interaction.user.id) ?? -1;
   if (
     !gameOngoing ||
-    !gameState.itaActive ||
-    gameState.dayIndex === 0 ||
+    //!gameState.itaActive ||
+    //gameState.dayIndex === 0 ||
     !currentPlayers.includes(interaction.user.id) ||
     gameState.players[playerIndex].alive === false ||
     gameState.dayITAs[gameState.dayIndex].filter(

@@ -211,7 +211,7 @@ async function startGame(interaction) {
         `Game cannot start, the required game channel from <${shuffledPlayers[i]}> is missing!`,
       );
     }
-
+    await clearMessages(shuffledPlayers[i]);
     await playerChannel.send(
       `**<@${shuffledPlayers[i]}>, you are ${shuffledRoles[i]}!**\n\nUse /ack to acknowledge that you have viewed your role and gain access to the public chats.`,
     );
