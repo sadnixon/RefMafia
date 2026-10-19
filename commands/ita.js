@@ -47,7 +47,7 @@ async function execute(interaction, user) {
   if (
     !gameOngoing ||
     !gameState.itaActive ||
-    gameState.dayIndex === 0 ||
+    gameState.dayIndex < 1 ||
     !currentPlayers.includes(interaction.user.id) ||
     gameState.players[playerIndex].alive === false ||
     gameState.dayITAs[gameState.dayIndex].filter(
@@ -67,7 +67,7 @@ async function execute(interaction, user) {
     gameState.players[targetIndex].alive === false
   ) {
     return interaction.editReply({
-      content: `Maronne! You can't kill them!`,
+      content: `Whoa there! You can't kill them!`,
       ephemeral: true,
     });
   }
@@ -78,21 +78,28 @@ async function execute(interaction, user) {
   );
 
   const randomRoll = randomNumber(1, 100);
-  const targetKilled =
+  const targetHit =
     randomRoll <= rolePool[gameState.players[playerIndex].role].itasuccess;
+  const targetKilled =
+    targetHit && gameState.players[targetIndex].shields === 0;
 
   gameState.dayITAs[gameState.dayIndex].push({
     id: interaction.user.id,
     target: targetUser,
+    hit: targetHit,
     killed: targetKilled,
   });
+
+  if (targetHit && gameState.players[targetIndex].shields > 0) {
+    gameState.players[targetIndex].shields -= 1;
+  }
 
   await gameInfo.set('gameState', gameState);
 
   await genChannel.send(
     standardEmbed(
       'An ITA has been made!',
-      `<@${interaction.user.id}> used their ITA on <@${targetUser}>! **It ${targetKilled ? 'KILLED them dead!' : 'absolutely WHIFFED!'}**`,
+      `<@${interaction.user.id}> used their ITA on <@${targetUser}>! **It ${targetKilled ? 'KILLED them dead!' : targetHit ? 'HIT, but no one died!' : 'absolutely WHIFFED!'}**`,
     ),
   );
 

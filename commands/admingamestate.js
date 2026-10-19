@@ -21,10 +21,22 @@ async function execute(interaction, user) {
     });
   }
 
+  const gameChannels = await gameInfo.get('game_channels');
+  const playerChannels = await gameInfo.get('player_channels');
+
   const gameOngoing = await gameInfo.get('inPlay');
-  if (!gameOngoing) {
+  if (
+    !gameOngoing ||
+    Object.values(gameChannels)
+      .map((e) => e.channelId)
+      .includes(interaction.channel.id) ||
+    Object.values(playerChannels)
+      .map((e) => e.channelId)
+      .includes(interaction.channel.id)
+  ) {
     return interaction.editReply({
-      content: 'This command can only be used during an ongoing game.',
+      content:
+        'This command can only be used during an ongoing game, in a host channel.',
       ephemeral: true,
     });
   }

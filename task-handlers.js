@@ -86,7 +86,7 @@ function initializeTaskHandlers(discordClient) {
 
       const leftAlive = gameState.players.filter((e) => e.alive).length;
       const mafiaAlive = gameState.players.filter(
-        (e) => e.alive && e.team === 'Mafia',
+        (e) => e.alive && e.team === 'Secret Hitler',
       ).length;
 
       if (mafiaAlive < leftAlive / 2 && mafiaAlive > 0) {
@@ -219,7 +219,7 @@ function initializeTaskHandlers(discordClient) {
 
     const leftAlive = gameState.players.filter((e) => e.alive).length;
     const mafiaAlive = gameState.players.filter(
-      (e) => e.alive && e.team === 'Mafia',
+      (e) => e.alive && e.team === 'Secret Hitler',
     ).length;
 
     if (mafiaAlive < leftAlive / 2 && mafiaAlive > 0) {

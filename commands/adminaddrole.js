@@ -22,18 +22,24 @@ const data = new SlashCommandBuilder()
       .setRequired(true)
       .addChoices(
         {
-          name: 'Town',
-          value: 'town',
+          name: 'Avalon',
+          value: 'avalon',
         },
         {
-          name: 'Mafia',
-          value: 'mafia',
+          name: 'Secret Hitler',
+          value: 'sh',
         },
         {
-          name: 'Non-Pack Mafia',
+          name: 'Non-Pack Secret Hitler',
           value: 'nonpack',
         },
       ),
+  )
+  .addStringOption((option) =>
+    option
+      .setName('pm')
+      .setDescription('The role PM that the player will get')
+      .setRequired(true),
   )
   .addIntegerOption((option) =>
     option
@@ -65,13 +71,15 @@ async function execute(interaction, user) {
 
   const role = interaction.options.getString('role');
   const team = interaction.options.getString('team');
+  const pm = interaction.options.getString('pm');
   const itanumber = interaction.options.getInteger('itanumber') ?? 1;
   const itasuccess = interaction.options.getInteger('itasuccess') ?? 15;
 
   rolePool[role] = {
     role: role,
-    team: team === 'town' ? 'Town' : 'Mafia',
+    team: team === 'avalon' ? 'Avalon' : 'Secret Hitler',
     nonpack: team === 'nonpack',
+    pm: pm,
     itanumber: itanumber,
     itasuccess: itasuccess,
   };

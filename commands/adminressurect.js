@@ -89,7 +89,7 @@ async function execute(interaction, user) {
     [PermissionFlagsBits.ReadMessageHistory]: false,
   });
   if (
-    gameState.players[playerIndex].team === 'Town' ||
+    gameState.players[playerIndex].team === 'Avalon' ||
     rolePool[gameState.players[playerIndex].role].nonpack
   ) {
     await spiesChannel.permissionOverwrites.edit(targetUser, {

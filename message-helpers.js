@@ -16,10 +16,10 @@ const errorMessage = (message) => {
 };
 
 const colorMap = {
-  Town: '#0087d6',
-  town: '#0087d6',
-  Mafia: '#fc4141',
-  mafia: '#fc4141',
+  Avalon: '#00d620',
+  avalon: '#00d620',
+  'Secret Hitler': '#fc4141',
+  sh: '#fc4141',
   Neutral: '#7f7f7f',
 };
 
@@ -54,7 +54,7 @@ async function startGame(interaction) {
 
   const knownSpies = shuffledPlayers.filter(
     (e, i) =>
-      rolePool[shuffledRoles[i]].team === 'Mafia' &&
+      rolePool[shuffledRoles[i]].team === 'Secret Hitler' &&
       rolePool[shuffledRoles[i]].nonpack === false,
   );
 
@@ -213,7 +213,7 @@ async function startGame(interaction) {
     }
     await clearMessages(shuffledPlayers[i]);
     await playerChannel.send(
-      `**<@${shuffledPlayers[i]}>, you are ${shuffledRoles[i]}!**\n\nUse /ack to acknowledge that you have viewed your role and gain access to the public chats.`,
+      `**<@${shuffledPlayers[i]}>, you are ${shuffledRoles[i]}!**\n${rolePool[shuffledRoles[i]].team === 'Avalon' ? '🟩' : '🟥'} ${rolePool[shuffledRoles[i]].pm} ${rolePool[shuffledRoles[i]].team === 'Avalon' ? '🟩' : '🟥'}\n\nUse /ack to acknowledge that you have viewed your role and gain access to the public chats.`,
     );
     if (knownSpies.includes(shuffledPlayers[i])) {
       if (
@@ -235,9 +235,9 @@ async function startGame(interaction) {
 
       await playerChannel.send(
         standardEmbed(
-          'La Cosa Nostra stands assembled:',
+          'The Secret Hitlers stand assembled:',
           `${knownSpies.map((e) => `<@${e}>`).join(', ')}`,
-          'Mafia',
+          'Secret Hitler',
         ),
       );
     }
@@ -259,8 +259,10 @@ async function startGame(interaction) {
       id: shuffledPlayers[i],
       role: shuffledRoles[i],
       team: rolePool[shuffledRoles[i]].team,
+      pm: rolePool[shuffledRoles[i]].pm,
       alive: true,
       flipped: false,
+      shields: 0,
     })),
     dayVotes: [
       Array(player_num).fill(null),
@@ -278,14 +280,91 @@ async function startGame(interaction) {
       Array(player_num).fill(null),
       Array(player_num).fill(null),
       Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
+      Array(player_num).fill(null),
     ],
     dayExecuted: [],
-    dayITAs: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
+    dayITAs: [
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+    ],
     itaActive: false,
-    dayChats: [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
-    chatLimit: 1000,
-    currentState: 'DaySupermaj',
-    dayIndex: 0,
+    dayChats: [
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+    ],
+    chatLimit: 400,
+    currentState: 'Night', //Starting at night
+    dayIndex: -1,
     phaseTimers: [],
     pausedState: null,
   };
@@ -296,12 +375,13 @@ async function startGame(interaction) {
 
   await sendGameState(interaction.client, 'general');
   await genChannel.send(
-    `${shuffledPlayers.map((e) => `<@${e}>`).join(', ')}, the Mafia have infiltrated your number, and the game has thus begun.`,
+    `${shuffledPlayers.map((e) => `<@${e}>`).join(', ')}, the evils have infiltrated your number, and the game has thus begun.`,
   );
-  await scheduleInXHours('end_supermaj', {}, 6);
+  //await scheduleInXHours('end_supermaj', {}, 6);
+  await scheduleInXHours('end_night', {}, 12);
   setTalkConfig({
     channelId: gameChannels['general'].channelId,
-    limit: 1000,
+    limit: 400,
   });
 }
 
@@ -348,7 +428,7 @@ async function sendGameState(
 
   const embed = standardEmbed(
     'Current Game State:',
-    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
+    `${gameState.players.map((e, i) => `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[i]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}${reveal ? ` ${e.shields}S` : ''}`).join('\n')}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
     embedColor,
   );
 
@@ -374,6 +454,12 @@ async function sendVoteState(
     channel = pickChannel;
   } else {
     channel = currentChannel;
+  }
+
+  if (gameState.dayIndex === -1) {
+    await channel.send(
+      standardEmbed('No vote state yet!', "It's just Night 0."),
+    );
   }
 
   let dayIndex = index - 1;
@@ -497,7 +583,7 @@ async function killPlayer(client, targetUser) {
   //Final check
   const leftAlive = gameState.players.filter((e) => e.alive).length;
   const mafiaAlive = gameState.players.filter(
-    (e) => e.alive && e.team === 'Mafia',
+    (e) => e.alive && e.team === 'Secret Hitler',
   ).length;
 
   if (mafiaAlive >= leftAlive / 2 || mafiaAlive === 0) {
@@ -506,6 +592,7 @@ async function killPlayer(client, targetUser) {
 }
 
 async function endGame(client) {
+  await clearTasks();
   const gameState = await gameInfo.get('gameState');
   const guild = await client.guilds.fetch(gameState.guildId);
   const currentPlayers = await gameInfo.get('players');
@@ -565,20 +652,20 @@ async function endGame(client) {
 
   const leftAlive = gameState.players.filter((e) => e.alive).length;
   const mafiaAlive = gameState.players.filter(
-    (e) => e.alive && e.team === 'Mafia',
+    (e) => e.alive && e.team === 'Secret Hitler',
   ).length;
 
   let winningTeam;
   if (mafiaAlive >= leftAlive / 2) {
     await announceChannel.send(
-      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# THE MAFIA WIN!`,
+      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# SECRET HITLER WINS!`,
     );
-    winningTeam = 'Mafia';
+    winningTeam = 'Secret Hitler';
   } else if (mafiaAlive === 0) {
     await announceChannel.send(
-      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# THE TOWN WIN!`,
+      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# AVALON WINS!`,
     );
-    winningTeam = 'Town';
+    winningTeam = 'Avalon';
   }
   gameState.endTime = Date.now();
   gameState.currentState = 'GameOver';

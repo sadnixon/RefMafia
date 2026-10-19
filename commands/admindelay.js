@@ -38,14 +38,28 @@ async function execute(interaction, user) {
   const gameState = await gameInfo.get('gameState');
   const hours = interaction.options.getInteger('hours');
 
+  const itaTimer = gameState.phaseTimers[1]?.timeStamp ?? null;
+
   await clearTasks();
 
   if (gameState.currentState === 'Night') {
     await scheduleInXHours('end_night', {}, hours);
   } else if (gameState.currentState === 'Day') {
     await scheduleInXHours('end_day', {}, hours);
+
+    if (gameState.itaActive && itaTimer != null) {
+      await scheduleTask('deactivate_ita', {}, hours - 1);
+    } else if (itaTimer != null) {
+      await scheduleTask('activate_ita', {}, itaTimer);
+    }
   } else {
     await scheduleInXHours('end_supermaj', {}, hours);
+
+    if (gameState.itaActive && itaTimer != null) {
+      await scheduleTask('deactivate_ita', {}, hours - 1);
+    } else if (itaTimer != null) {
+      await scheduleTask('activate_ita', {}, itaTimer);
+    }
   }
 
   await interaction.editReply({

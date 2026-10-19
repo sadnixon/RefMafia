@@ -38,6 +38,8 @@ async function execute(interaction, user) {
     return;
   }
 
+  const gameState = await gameInfo.get('gameState');
+
   sawRolePlayers.push(interaction.user.id);
   await gameInfo.set('sawRolePlayers', sawRolePlayers);
 
@@ -59,13 +61,14 @@ async function execute(interaction, user) {
   const paragraphsChannel = await interaction.guild.channels.fetch(
     gameChannels['paragraphs'].channelId,
   );
-
-  await genChannel.permissionOverwrites.edit(interaction.user.id, {
-    [PermissionFlagsBits.SendMessages]: true,
-  });
-  await picksChannel.permissionOverwrites.edit(interaction.user.id, {
-    [PermissionFlagsBits.SendMessages]: true,
-  });
+  if (gameState.currentState !== 'Night') {
+    await genChannel.permissionOverwrites.edit(interaction.user.id, {
+      [PermissionFlagsBits.SendMessages]: true,
+    });
+    await picksChannel.permissionOverwrites.edit(interaction.user.id, {
+      [PermissionFlagsBits.SendMessages]: true,
+    });
+  }
   await paragraphsChannel.permissionOverwrites.edit(interaction.user.id, {
     [PermissionFlagsBits.SendMessages]: true,
   });
