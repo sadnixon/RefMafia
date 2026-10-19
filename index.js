@@ -47,6 +47,8 @@ if (ENABLE_SENTRY) {
 // Database
 // -----------------------------------------------------------------------------
 
+global.voteCycler = 0;
+
 const mongoStore = new KeyvMongo('mongodb://localhost:27017/refmafia');
 
 global.authorizedDataSetters = ENABLE_DB

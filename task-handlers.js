@@ -164,6 +164,7 @@ function initializeTaskHandlers(discordClient) {
     }
 
     await clearTasks();
+    gameState = await gameInfo.get('gameState');
 
     let mostVotes = 0;
     let mostVotesPlayers = [];
@@ -287,6 +288,7 @@ function initializeTaskHandlers(discordClient) {
     }
 
     await clearTasks();
+    gameState = await gameInfo.get('gameState');
 
     for (const id of gameState.players
       .filter((e) => e.alive)
@@ -315,7 +317,8 @@ function initializeTaskHandlers(discordClient) {
 
     await gameInfo.set('gameState', gameState);
 
-    await scheduleInXHours('end_supermaj', {}, 6);
+    //await scheduleInXHours('end_supermaj', {}, 6);
+    await scheduleInXHours('end_day', {}, 12);
     await scheduleInXHours('activate_ita', {}, 1);
     await sendGameState(client);
     await genChannel.send(

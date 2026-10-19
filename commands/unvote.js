@@ -46,7 +46,7 @@ async function execute(interaction, user) {
   const pickChannel = await interaction.guild.channels.fetch(
     gameChannels['picks'].channelId,
   );
-  
+
   gameState.dayVotes[gameState.dayIndex][playerIndex] = null;
 
   await gameInfo.set('gameState', gameState);
@@ -61,7 +61,27 @@ async function execute(interaction, user) {
     content: `You unvoted!`,
     ephemeral: true,
   });
-  await sendVoteState(interaction.client);
+
+  voteCycler = (voteCycler + 1) % 10;
+
+  let mostVotes = 0;
+  for (const player of [...currentPlayers, 'Sleep']) {
+    const voteCount = gameState.dayVotes[gameState.dayIndex].filter(
+      (e) => e === player,
+    ).length;
+    if (voteCount > mostVotes) {
+      mostVotes = voteCount;
+    }
+  }
+
+  const voteMaj =
+    gameState.currentState === 'Day'
+      ? Math.floor(gameState.players.filter((e) => e.alive).length / 2) + 1
+      : Math.ceil((gameState.players.filter((e) => e.alive).length * 2) / 3);
+
+  if (voteCycler === 0 || mostVotes >= voteMaj - 3) {
+    await sendVoteState(interaction.client);
+  }
 }
 
 module.exports = {

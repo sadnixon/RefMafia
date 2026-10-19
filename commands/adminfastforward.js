@@ -50,6 +50,7 @@ async function execute(interaction, user) {
 
   if (gameState.currentState === 'Night') {
     await clearTasks();
+    gameState = await gameInfo.get('gameState');
 
     for (const id of gameState.players
       .filter((e) => e.alive)
@@ -75,12 +76,14 @@ async function execute(interaction, user) {
       });
     }
 
-    gameState.currentState = 'DaySupermaj';
+    //gameState.currentState = 'DaySupermaj';
+    gameState.currentState = 'Day';
     gameState.dayIndex += 1;
 
     await gameInfo.set('gameState', gameState);
 
-    await scheduleInXHours('end_supermaj', {}, 6);
+    //await scheduleInXHours('end_supermaj', {}, 6);
+    await scheduleInXHours('end_day', {}, 12);
     await scheduleInXHours('activate_ita', {}, 1);
     await sendGameState(interaction.client);
     await genChannel.send(
@@ -89,6 +92,7 @@ async function execute(interaction, user) {
   } else {
     const itaTimer = gameState.phaseTimers[1]?.timeStamp ?? null;
     await clearTasks();
+    gameState = await gameInfo.get('gameState');
 
     let mostVotes = 0;
     let mostVotesPlayers = [];

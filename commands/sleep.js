@@ -82,12 +82,27 @@ async function execute(interaction, user) {
     content: `You made a vote!`,
     ephemeral: true,
   });
-  await sendVoteState(interaction.client);
 
   const voteMaj =
     gameState.currentState === 'Day'
       ? Math.floor(gameState.players.filter((e) => e.alive).length / 2) + 1
       : Math.ceil((gameState.players.filter((e) => e.alive).length * 2) / 3);
+
+  voteCycler = (voteCycler + 1) % 10;
+
+  let mostVotes = 0;
+  for (const player of [...currentPlayers, 'Sleep']) {
+    const voteCount = gameState.dayVotes[gameState.dayIndex].filter(
+      (e) => e === player,
+    ).length;
+    if (voteCount > mostVotes) {
+      mostVotes = voteCount;
+    }
+  }
+
+  if (voteCycler === 0 || mostVotes >= voteMaj - 3) {
+    await sendVoteState(interaction.client);
+  }
 
   if (
     gameState.dayVotes[gameState.dayIndex].filter((e) => e === 'Sleep')
