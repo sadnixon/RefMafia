@@ -428,7 +428,7 @@ async function sendGameState(
 
   let pCrowns = {};
 
-  for (const player in gameState.players) {
+  for (const player of gameState.players) {
     if (reveal && winner !== 'none' && player.team === winner) {
       pCrowns[player.id] = '👑';
     } else {
