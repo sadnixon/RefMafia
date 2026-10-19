@@ -62,7 +62,7 @@ async function execute(interaction, user) {
     ephemeral: true,
   });
 
-  voteCycler = (voteCycler + 1) % 10;
+  voteCycler = (voteCycler + 1) % 5;
 
   let mostVotes = 0;
   for (const player of [...currentPlayers, 'Sleep']) {

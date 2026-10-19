@@ -108,7 +108,7 @@ async function execute(interaction, user) {
       ? Math.floor(gameState.players.filter((e) => e.alive).length / 2) + 1
       : Math.ceil((gameState.players.filter((e) => e.alive).length * 2) / 3);
 
-  voteCycler = (voteCycler + 1) % 10;
+  voteCycler = (voteCycler + 1) % 5;
 
   let mostVotes = 0;
   for (const player of [...currentPlayers, 'Sleep']) {
