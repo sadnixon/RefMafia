@@ -162,6 +162,21 @@ async function startGame(interaction) {
   ]);
 
   for (let i = 0; i < player_num; i++) {
+    let playerChannel;
+    try {
+      playerChannel = await interaction.guild.channels.fetch(
+        playerChannels[shuffledPlayers[i]].channelId,
+      );
+    } catch (error) {
+      console.error('Failed to get all channels:', error);
+      process.exitCode = 1;
+      return interaction.channel.send(
+        `Game cannot start, the required game channel from <${shuffledPlayers[i]}> is missing!`,
+      );
+    }
+  }
+
+  for (let i = 0; i < player_num; i++) {
     if (
       !_.range(0, 13)
         .map((e) => `${e * 100}`)
