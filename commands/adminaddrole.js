@@ -17,9 +17,15 @@ const data = new SlashCommandBuilder()
   )
   .addStringOption((option) =>
     option
+      .setName('pm')
+      .setDescription('The role PM that the player will get')
+      .setRequired(true),
+  )
+  .addStringOption((option) =>
+    option
       .setName('team')
       .setDescription('The team the role will be on')
-      .setRequired(true)
+      .setRequired(false)
       .addChoices(
         {
           name: 'Avalon',
@@ -34,12 +40,6 @@ const data = new SlashCommandBuilder()
           value: 'nonpack',
         },
       ),
-  )
-  .addStringOption((option) =>
-    option
-      .setName('pm')
-      .setDescription('The role PM that the player will get')
-      .setRequired(true),
   )
   .addIntegerOption((option) =>
     option
@@ -70,10 +70,10 @@ async function execute(interaction, user) {
   const rolePool = await gameInfo.get('rolePool');
 
   const role = interaction.options.getString('role');
-  const team = interaction.options.getString('team');
+  const team = interaction.options.getString('team') ?? 'avalon';
   const pm = interaction.options.getString('pm');
   const itanumber = interaction.options.getInteger('itanumber') ?? 1;
-  const itasuccess = interaction.options.getInteger('itasuccess') ?? 15;
+  const itasuccess = interaction.options.getInteger('itasuccess') ?? 17;
 
   rolePool[role] = {
     role: role,
