@@ -47,7 +47,7 @@ async function execute(interaction, user) {
 
   const gameChannels = await gameInfo.get('game_channels');
 
-  gameState.players[playerIndex].alive = false;
+  gameState.players[playerIndex].alive = true;
   gameState.players[playerIndex].flipped = false;
 
   await gameInfo.set('gameState', gameState);

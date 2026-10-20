@@ -50,7 +50,7 @@ async function execute(interaction, user) {
     ephemeral: true,
   });
 
-  await killPlayer(interaction.client, targetUser);
+  await killPlayer(interaction.client, targetUser, false);
 }
 
 module.exports = {

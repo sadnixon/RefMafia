@@ -551,7 +551,7 @@ async function sendVoteState(
   await channel.send(embed);
 }
 
-async function killPlayer(client, targetUser) {
+async function killPlayer(client, targetUser, announce = true) {
   const gameState = await gameInfo.get('gameState');
   const guild = await client.guilds.fetch(gameState.guildId);
   const gameChannels = await gameInfo.get('game_channels');
@@ -564,9 +564,15 @@ async function killPlayer(client, targetUser) {
   const killedChats =
     (await chatCounts.get(`talkCount:${gameState.guildId}:${targetUser}`)) ?? 0;
 
-  await announceChannel.send(
-    `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
-  );
+  if (announce) {
+    await announceChannel.send(
+      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
+    );
+  } else {
+    await announceChannel.send(
+      `Rest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
+    );
+  }
 
   const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
   gameState.players[playerIndex].alive = false;

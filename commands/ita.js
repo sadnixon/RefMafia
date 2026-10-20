@@ -76,6 +76,9 @@ async function execute(interaction, user) {
   const genChannel = await interaction.guild.channels.fetch(
     gameChannels['general'].channelId,
   );
+  const pickChannel = await interaction.guild.channels.fetch(
+    gameChannels['picks'].channelId,
+  );
 
   const randomRoll = randomNumber(1, 100);
   const targetHit =
@@ -102,9 +105,15 @@ async function execute(interaction, user) {
       `<@${interaction.user.id}> used their ITA on <@${targetUser}>! **It ${targetKilled ? 'KILLED them dead!' : targetHit ? 'HIT, but no one died!' : 'absolutely WHIFFED!'}**`,
     ),
   );
+  await pickChannel.send(
+    standardEmbed(
+      'An ITA has been made!',
+      `<@${interaction.user.id}> used their ITA on <@${targetUser}>! **It ${targetKilled ? 'KILLED them dead!' : targetHit ? 'HIT, but no one died!' : 'absolutely WHIFFED!'}**`,
+    ),
+  );
 
   if (targetKilled) {
-    await killPlayer(interaction.client, targetUser);
+    await killPlayer(interaction.client, targetUser, false);
   }
 
   await interaction.editReply({
