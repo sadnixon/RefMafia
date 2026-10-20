@@ -445,10 +445,20 @@ async function sendGameState(
       (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
   }
 
+  const alivePlayers = gameState.players.filter((e) => e.alive).length;
+
+  const voteMaj =
+    gameState.currentState === 'Day'
+      ? Math.floor(alivePlayers / 2) + 1
+      : Math.ceil((alivePlayers * 2) / 3);
+
   const embed = standardEmbed(
     'Current Game State:',
     `${gameState.players
       .sort((a, b) => {
+        if (a.alive !== b.alive) {
+          return a.alive ? 1 : -1;
+        }
         if (reveal) {
           const teamDiff = a.team.localeCompare(b.team);
           if (teamDiff !== 0) return teamDiff;
@@ -461,7 +471,7 @@ async function sendGameState(
       )
       .join(
         '\n',
-      )}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
+      )}\n\nPlayers Left Alive:${alivePlayers}\nMajority Threshold:${voteMaj}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
     embedColor,
   );
 
@@ -566,11 +576,11 @@ async function killPlayer(client, targetUser, announce = true) {
 
   if (announce) {
     await announceChannel.send(
-      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nRest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
+      `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\n# Rest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
     );
   } else {
     await announceChannel.send(
-      `Rest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
+      `# Rest in peace <@${targetUser}> (${killedChats}), who has been executed!`,
     );
   }
 
