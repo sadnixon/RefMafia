@@ -30,7 +30,7 @@ async function execute(interaction, user) {
   }
 
   const gameOngoing = await gameInfo.get('inPlay');
-  const currentPlayers = await gameInfo.get('players');
+  let currentPlayers = await gameInfo.get('players');
   const playerChannels = await gameInfo.get('player_channels');
   const userOut = interaction.options.getUser('userout').id;
   const userIn = interaction.options.getUser('userin').id;
