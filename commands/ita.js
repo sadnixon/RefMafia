@@ -113,7 +113,13 @@ async function execute(interaction, user) {
   );
 
   if (targetKilled) {
-    await killPlayer(interaction.client, targetUser, false);
+    await killPlayer(
+      interaction.client,
+      targetUser,
+      `D${gameState.dayIndex + 1} ITA`,
+      null,
+      false,
+    );
   }
 
   await interaction.editReply({

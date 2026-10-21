@@ -49,6 +49,8 @@ async function execute(interaction, user) {
 
   gameState.players[playerIndex].alive = true;
   gameState.players[playerIndex].flipped = false;
+  gameState.players[playerIndex].killReason = null,
+  gameState.players[playerIndex].killOrder = null,
 
   await gameInfo.set('gameState', gameState);
 

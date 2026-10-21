@@ -144,7 +144,11 @@ async function execute(interaction, user) {
 
     await gameInfo.set('gameState', gameState);
 
-    await killPlayer(interaction.client, targetUser);
+    await killPlayer(
+      interaction.client,
+      targetUser,
+      `D${gameState.dayIndex + 1} VOTE`,
+    );
 
     gameState = await gameInfo.get('gameState');
 

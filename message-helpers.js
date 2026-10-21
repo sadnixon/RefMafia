@@ -278,6 +278,8 @@ async function startGame(interaction) {
       alive: true,
       flipped: false,
       shields: 0,
+      killOrder: null,
+      killReason: null,
     })),
     dayVotes: [
       Array(player_num).fill(null),
@@ -456,6 +458,13 @@ async function sendGameState(
     'Current Game State:',
     `${gameState.players
       .sort((a, b) => {
+        if (a.killOrder != null || b.killOrder != null) {
+          if (a.killOrder == null) return 1;
+          if (b.killOrder == null) return -1;
+          if (a.killOrder !== b.killOrder) {
+            return b.killOrder - a.killOrder;
+          }
+        }
         if (a.alive !== b.alive) {
           return a.alive ? 1 : -1;
         }
@@ -467,7 +476,7 @@ async function sendGameState(
       })
       .map(
         (e, i) =>
-          `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[e.id]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team})**` : ''}${reveal ? ` ${e.shields}S` : ''}`,
+          `${i + 1}. ${e.alive ? '' : '~~'}<@${e.id}> (${cDayChats[e.id]}) ${pCrowns[e.id]}${e.alive ? '' : '~~'} ${reveal || e.flipped ? `**(${e.role}, ${e.team === 'Avalon' ? '🟩' : '🟥'})**, ${e.killReason ? `${e.killReason}` : ''}` : ''}${reveal ? ` ${e.shields}S` : ''}`,
       )
       .join(
         '\n',
@@ -537,7 +546,7 @@ async function sendVoteState(
 
   const optionVotes = (option) => {
     return gameState.players
-      .filter((e, i) => cDayVotes[i] === option)
+      .filter((e, i) => cDayVotes[i] === option && e.alive)
       .map((e) => e.id);
   };
 
@@ -561,7 +570,13 @@ async function sendVoteState(
   await channel.send(embed);
 }
 
-async function killPlayer(client, targetUser, announce = true) {
+async function killPlayer(
+  client,
+  targetUser,
+  reason,
+  order = null,
+  announce = true,
+) {
   const gameState = await gameInfo.get('gameState');
   const guild = await client.guilds.fetch(gameState.guildId);
   const gameChannels = await gameInfo.get('game_channels');
@@ -586,6 +601,13 @@ async function killPlayer(client, targetUser, announce = true) {
 
   const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
   gameState.players[playerIndex].alive = false;
+  gameState.players[playerIndex].killReason = reason;
+  if (order) {
+    gameState.players[playerIndex].killOrder = order;
+  } else {
+    gameState.players[playerIndex].killOrder =
+      gameState.players.filter((e) => e.alive === false).length + 1;
+  }
 
   if (gameState.currentState !== 'Night') {
     for (let i; i < currentPlayers.length; i++) {

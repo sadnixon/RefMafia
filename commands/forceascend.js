@@ -16,6 +16,18 @@ const data = new SlashCommandBuilder()
       .setName('user')
       .setDescription('The user to ascend')
       .setRequired(true),
+  )
+  .addStringOption((option) =>
+    option
+      .setName('reason')
+      .setDescription('The reason for the kill')
+      .setRequired(true),
+  )
+  .addIntegerOption((option) =>
+    option
+      .setName('order')
+      .setDescription('The number kill that this player was')
+      .setRequired(false),
   );
 
 async function execute(interaction, user) {
@@ -34,7 +46,6 @@ async function execute(interaction, user) {
   }
   const gameOngoing = await gameInfo.get('inPlay');
   const currentPlayers = await gameInfo.get('players');
-  const gameState = await gameInfo.get('gameState');
   const targetUser = interaction.options.getUser('user').id;
 
   if (!gameOngoing || !currentPlayers.includes(targetUser)) {
@@ -45,12 +56,21 @@ async function execute(interaction, user) {
     return;
   }
 
+  const reason = interaction.options.getString('reason');
+  const order = interaction.options.getInteger('order') ?? null;
+
   await interaction.editReply({
     content: `They're getting ascended!`,
     ephemeral: true,
   });
 
-  await killPlayer(interaction.client, targetUser, false);
+  await killPlayer(
+    interaction.client,
+    targetUser,
+    reason.toUpperCase(),
+    order,
+    false,
+  );
 }
 
 module.exports = {

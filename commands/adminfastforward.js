@@ -141,7 +141,7 @@ async function execute(interaction, user) {
         `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
       );
     } else {
-      await killPlayer(interaction.client, targetUser);
+      await killPlayer(interaction.client, targetUser, `D${gameState.dayIndex+1} VOTE`);
     }
 
     gameState = await gameInfo.get('gameState');

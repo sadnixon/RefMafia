@@ -59,12 +59,21 @@ async function execute(interaction, user) {
   const pickChannel = await interaction.guild.channels.fetch(
     gameChannels['picks'].channelId,
   );
+  const genChannel = await interaction.guild.channels.fetch(
+    gameChannels['general'].channelId,
+  );
 
   gameState.dayVotes[gameState.dayIndex][playerIndex] = null;
 
   await gameInfo.set('gameState', gameState);
 
   await pickChannel.send(
+    standardEmbed(
+      'A vote has been retracted!',
+      `**<@${targetUser}> has unvoted!**`,
+    ),
+  );
+  await genChannel.send(
     standardEmbed(
       'A vote has been retracted!',
       `**<@${targetUser}> has unvoted!**`,

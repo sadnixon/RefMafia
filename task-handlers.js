@@ -79,7 +79,7 @@ function initializeTaskHandlers(discordClient) {
           `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
         );
       } else {
-        await killPlayer(client, mostVotesPlayer);
+        await killPlayer(client, mostVotesPlayer, `D${gameState.dayIndex+1} VOTE`);
       }
 
       gameState = await gameInfo.get('gameState');
@@ -213,7 +213,7 @@ function initializeTaskHandlers(discordClient) {
         `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
       );
     } else {
-      await killPlayer(client, targetUser);
+      await killPlayer(client, targetUser, `D${gameState.dayIndex+1} VOTE`);
     }
 
     gameState = await gameInfo.get('gameState');
