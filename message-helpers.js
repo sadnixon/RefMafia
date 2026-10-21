@@ -24,7 +24,7 @@ const colorMap = {
 };
 
 const standardEmbed = (header, message, team = 'Neutral') => {
-  const MAX_LENGTH = 4096;
+  const MAX_LENGTH = 2000;
 
   if (message.length <= MAX_LENGTH) {
     return {
