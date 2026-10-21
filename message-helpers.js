@@ -587,6 +587,15 @@ async function killPlayer(client, targetUser, announce = true) {
   const playerIndex = gameState.players.map((e) => e.id).indexOf(targetUser);
   gameState.players[playerIndex].alive = false;
 
+  if (gameState.currentState !== 'Night') {
+    for (let i; i < currentPlayers.length; i++) {
+      if (gameState.dayVotes[gameState.dayIndex][i] === targetUser) {
+        gameState.dayVotes[gameState.dayIndex][i] = null;
+      }
+    }
+    gameState.dayVotes[gameState.dayIndex][playerIndex] = null;
+  }
+
   await gameInfo.set('gameState', gameState);
 
   const genChannel = await guild.channels.fetch(
