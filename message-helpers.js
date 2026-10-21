@@ -24,11 +24,48 @@ const colorMap = {
 };
 
 const standardEmbed = (header, message, team = 'Neutral') => {
+  const MAX_LENGTH = 4096;
+
+  if (message.length <= MAX_LENGTH) {
+    return {
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(header)
+          .setDescription(message)
+          .setColor(colorMap[team]),
+      ],
+    };
+  }
+
+  // Find the newline closest to the midpoint of the message
+  const midpoint = Math.floor(message.length / 2);
+  let splitIndex = message.lastIndexOf('\n', midpoint);
+  const nextSplitIndex = message.indexOf('\n', midpoint);
+
+  if (
+    nextSplitIndex !== -1 &&
+    (splitIndex === -1 ||
+      nextSplitIndex - midpoint < midpoint - splitIndex)
+  ) {
+    splitIndex = nextSplitIndex;
+  }
+
+  // If no newline exists, fall back to splitting at the midpoint
+  if (splitIndex === -1) {
+    splitIndex = midpoint;
+  }
+
+  const firstPart = message.slice(0, splitIndex).trimEnd();
+  const secondPart = message.slice(splitIndex + 1).trimStart();
+
   return {
     embeds: [
       new EmbedBuilder()
         .setTitle(header)
-        .setDescription(message)
+        .setDescription(firstPart)
+        .setColor(colorMap[team]),
+      new EmbedBuilder()
+        .setDescription(secondPart)
         .setColor(colorMap[team]),
     ],
   };
