@@ -79,7 +79,11 @@ function initializeTaskHandlers(discordClient) {
           `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
         );
       } else {
-        await killPlayer(client, mostVotesPlayer, `D${gameState.dayIndex+1} VOTE`);
+        await killPlayer(
+          client,
+          mostVotesPlayer,
+          `D${gameState.dayIndex + 1} VOTE`,
+        );
       }
 
       gameState = await gameInfo.get('gameState');
@@ -213,7 +217,7 @@ function initializeTaskHandlers(discordClient) {
         `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
       );
     } else {
-      await killPlayer(client, targetUser, `D${gameState.dayIndex+1} VOTE`);
+      await killPlayer(client, targetUser, `D${gameState.dayIndex + 1} VOTE`);
     }
 
     gameState = await gameInfo.get('gameState');
@@ -290,10 +294,14 @@ function initializeTaskHandlers(discordClient) {
     await clearTasks();
     gameState = await gameInfo.get('gameState');
 
+    for (const id of gameState.players.map((e) => e.id)) {
+      await clearMessages(id);
+    }
+
     for (const id of gameState.players
       .filter((e) => e.alive)
       .map((e) => e.id)) {
-      await clearMessages(id);
+      //await clearMessages(id);
       console.log(id);
       const member = await guild.members.fetch(id).catch(() => null);
       console.log(id, member ? 'found' : 'NOT IN GUILD');
@@ -312,7 +320,7 @@ function initializeTaskHandlers(discordClient) {
       });
     }
 
-    gameState.currentState = 'DaySupermaj';
+    gameState.currentState = 'Day';
     gameState.dayIndex += 1;
 
     await gameInfo.set('gameState', gameState);

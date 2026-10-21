@@ -1,6 +1,6 @@
 'use strict';
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { getTalkConfig, setTalkConfig } = require('../talkstate');
 
 const data = new SlashCommandBuilder()
@@ -35,8 +35,38 @@ async function execute(interaction, user) {
   const number = interaction.options.getInteger('number');
 
   const gameState = await gameInfo.get('gameState');
-
+  
+  const oldLimit = gameState.chatLimit;
   gameState.chatLimit = number;
+
+  const gameChannels = await gameInfo.get('game_channels');
+
+  const genChannel = await message.guild.channels.fetch(
+    gameChannels['general'].channelId,
+  );
+  const nongameChannel = await message.guild.channels.fetch(
+    gameChannels['nongame'].channelId,
+  );
+  const picksChannel = await message.guild.channels.fetch(
+    gameChannels['picks'].channelId,
+  );
+
+  for (const id of gameState.players.map((e) => e.id)) {
+    let playerChats =
+      (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    if (playerChats >= oldLimit && playerChats < number) {
+      await genChannel.permissionOverwrites.edit(message.author.id, {
+        [PermissionFlagsBits.SendMessages]: true,
+      });
+      await nongameChannel.permissionOverwrites.edit(message.author.id, {
+        [PermissionFlagsBits.SendMessages]: true,
+      });
+      await picksChannel.permissionOverwrites.edit(message.author.id, {
+        [PermissionFlagsBits.SendMessages]: true,
+      });
+    }
+  }
+
   await gameInfo.set('gameState', gameState);
 
   const talkConfig = getTalkConfig();

@@ -606,7 +606,7 @@ async function killPlayer(
     gameState.players[playerIndex].killOrder = order;
   } else {
     gameState.players[playerIndex].killOrder =
-      gameState.players.filter((e) => e.alive === false).length + 1;
+      gameState.players.filter((e) => e.alive === false).length;
   }
 
   if (gameState.currentState !== 'Night') {

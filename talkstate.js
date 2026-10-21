@@ -37,9 +37,9 @@ async function countMessage(message) {
     const picksChannel = await message.guild.channels.fetch(
       gameChannels['picks'].channelId,
     );
-    const paragraphsChannel = await message.guild.channels.fetch(
-      gameChannels['paragraphs'].channelId,
-    );
+    //const paragraphsChannel = await message.guild.channels.fetch(
+    //  gameChannels['paragraphs'].channelId,
+    //);
 
     const member = await message.guild.members
       .fetch(message.author.id)
@@ -54,9 +54,9 @@ async function countMessage(message) {
     await picksChannel.permissionOverwrites.edit(message.author.id, {
       [PermissionFlagsBits.SendMessages]: false,
     });
-    await paragraphsChannel.permissionOverwrites.edit(message.author.id, {
-      [PermissionFlagsBits.SendMessages]: false,
-    });
+    //await paragraphsChannel.permissionOverwrites.edit(message.author.id, {
+    //  [PermissionFlagsBits.SendMessages]: false,
+    //});
 
     await genChannel.send(
       `<@${message.author.id}>, you just ran out of chats for today!`,
