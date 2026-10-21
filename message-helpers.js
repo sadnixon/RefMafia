@@ -462,7 +462,7 @@ async function sendGameState(
           if (a.killOrder == null) return 1;
           if (b.killOrder == null) return -1;
           if (a.killOrder !== b.killOrder) {
-            return b.killOrder - a.killOrder;
+            return a.killOrder - b.killOrder;
           }
         }
         if (a.alive !== b.alive) {
@@ -480,7 +480,7 @@ async function sendGameState(
       )
       .join(
         '\n',
-      )}\n\nPlayers Left Alive:${alivePlayers}\nMajority Threshold:${voteMaj}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
+      )}\n\n**Players Left Alive:** ${alivePlayers}\n**Majority Threshold:** ${voteMaj}\n\n**State:** ${gameState.currentState}${gameState.phaseTimers.length > 0 ? `\nPhase Ends <t:${Math.floor(gameState.phaseTimers[0].timeStamp / 1000)}:R>` : ''}${gameState.phaseTimers.length > 1 ? `\nITAs ${gameState.itaActive ? 'Deactivate' : 'Activate'} <t:${Math.floor(gameState.phaseTimers[1].timeStamp / 1000)}:R>` : '\nITAs Deactivated'}`,
     embedColor,
   );
 
