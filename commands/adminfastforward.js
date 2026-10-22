@@ -52,7 +52,7 @@ async function execute(interaction, user) {
     await clearTasks();
     gameState = await gameInfo.get('gameState');
 
-    for (const id of gameState.players) {
+    for (const id of gameState.players.map((e) => e.id)) {
       await clearMessages(id);
     }
 
@@ -83,6 +83,7 @@ async function execute(interaction, user) {
     //gameState.currentState = 'DaySupermaj';
     gameState.currentState = 'Day';
     gameState.dayIndex += 1;
+    gameState.itaActive = false;
 
     await gameInfo.set('gameState', gameState);
 
