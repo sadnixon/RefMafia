@@ -55,6 +55,9 @@ async function execute(interaction, user) {
     let playerChats =
       (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
     if (playerChats >= oldLimit && playerChats < number) {
+      const member = await interaction.guild.members.fetch(id).catch(() => null);
+      console.log(id, member ? 'found' : 'NOT IN GUILD');
+      if (!member) continue;
       await genChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
