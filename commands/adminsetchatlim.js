@@ -51,11 +51,13 @@ async function execute(interaction, user) {
     gameChannels['picks'].channelId,
   );
 
-  for (const id of gameState.players.map((e) => e.id)) {
+  for (const id of gameState.players.filter((e) => e.alive).map((e) => e.id)) {
     let playerChats =
       (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
     if (playerChats >= oldLimit && playerChats < number) {
-      const member = await interaction.guild.members.fetch(id).catch(() => null);
+      const member = await interaction.guild.members
+        .fetch(id)
+        .catch(() => null);
       console.log(id, member ? 'found' : 'NOT IN GUILD');
       if (!member) continue;
       await genChannel.permissionOverwrites.edit(id, {
@@ -66,6 +68,29 @@ async function execute(interaction, user) {
       });
       await picksChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
+      });
+    }
+  }
+
+  for (const id of gameState.players
+    .filter((e) => e.alive === false)
+    .map((e) => e.id)) {
+    let playerChats =
+      (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
+    if (playerChats >= oldLimit && playerChats < number) {
+      const member = await interaction.guild.members
+        .fetch(id)
+        .catch(() => null);
+      console.log(id, member ? 'found' : 'NOT IN GUILD');
+      if (!member) continue;
+      await genChannel.permissionOverwrites.edit(id, {
+        [PermissionFlagsBits.SendMessages]: false,
+      });
+      await nongameChannel.permissionOverwrites.edit(id, {
+        [PermissionFlagsBits.SendMessages]: false,
+      });
+      await picksChannel.permissionOverwrites.edit(id, {
+        [PermissionFlagsBits.SendMessages]: false,
       });
     }
   }
