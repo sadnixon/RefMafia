@@ -77,22 +77,18 @@ async function execute(interaction, user) {
     .map((e) => e.id)) {
     let playerChats =
       (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
-    if (playerChats >= oldLimit && playerChats < number) {
-      const member = await interaction.guild.members
-        .fetch(id)
-        .catch(() => null);
-      console.log(id, member ? 'found' : 'NOT IN GUILD');
-      if (!member) continue;
-      await genChannel.permissionOverwrites.edit(id, {
-        [PermissionFlagsBits.SendMessages]: false,
-      });
-      await nongameChannel.permissionOverwrites.edit(id, {
-        [PermissionFlagsBits.SendMessages]: false,
-      });
-      await picksChannel.permissionOverwrites.edit(id, {
-        [PermissionFlagsBits.SendMessages]: false,
-      });
-    }
+    const member = await interaction.guild.members.fetch(id).catch(() => null);
+    console.log(id, member ? 'found' : 'NOT IN GUILD');
+    if (!member) continue;
+    await genChannel.permissionOverwrites.edit(id, {
+      [PermissionFlagsBits.SendMessages]: false,
+    });
+    await nongameChannel.permissionOverwrites.edit(id, {
+      [PermissionFlagsBits.SendMessages]: false,
+    });
+    await picksChannel.permissionOverwrites.edit(id, {
+      [PermissionFlagsBits.SendMessages]: false,
+    });
   }
 
   await gameInfo.set('gameState', gameState);
