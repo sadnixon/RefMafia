@@ -52,10 +52,14 @@ async function execute(interaction, user) {
     await clearTasks();
     gameState = await gameInfo.get('gameState');
 
+    for (const id of gameState.players) {
+      await clearMessages(id);
+    }
+
     for (const id of gameState.players
       .filter((e) => e.alive)
       .map((e) => e.id)) {
-      await clearMessages(id);
+      //await clearMessages(id);
       console.log(id);
       const member = await interaction.guild.members
         .fetch(id)
@@ -141,7 +145,11 @@ async function execute(interaction, user) {
         `${currentPlayers.map((e) => `<@${e}>`).join(' ')}\nNobody has been executed, everyone sleeps!`,
       );
     } else {
-      await killPlayer(interaction.client, targetUser, `D${gameState.dayIndex+1} VOTE`);
+      await killPlayer(
+        interaction.client,
+        targetUser,
+        `D${gameState.dayIndex + 1} VOTE`,
+      );
     }
 
     gameState = await gameInfo.get('gameState');

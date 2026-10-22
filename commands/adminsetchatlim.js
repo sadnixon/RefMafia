@@ -35,19 +35,19 @@ async function execute(interaction, user) {
   const number = interaction.options.getInteger('number');
 
   const gameState = await gameInfo.get('gameState');
-  
+
   const oldLimit = gameState.chatLimit;
   gameState.chatLimit = number;
 
   const gameChannels = await gameInfo.get('game_channels');
 
-  const genChannel = await message.guild.channels.fetch(
+  const genChannel = await interaction.guild.channels.fetch(
     gameChannels['general'].channelId,
   );
-  const nongameChannel = await message.guild.channels.fetch(
+  const nongameChannel = await interaction.guild.channels.fetch(
     gameChannels['nongame'].channelId,
   );
-  const picksChannel = await message.guild.channels.fetch(
+  const picksChannel = await interaction.guild.channels.fetch(
     gameChannels['picks'].channelId,
   );
 
@@ -55,13 +55,13 @@ async function execute(interaction, user) {
     let playerChats =
       (await chatCounts.get(`talkCount:${gameState.guildId}:${id}`)) ?? 0;
     if (playerChats >= oldLimit && playerChats < number) {
-      await genChannel.permissionOverwrites.edit(message.author.id, {
+      await genChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
-      await nongameChannel.permissionOverwrites.edit(message.author.id, {
+      await nongameChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
-      await picksChannel.permissionOverwrites.edit(message.author.id, {
+      await picksChannel.permissionOverwrites.edit(id, {
         [PermissionFlagsBits.SendMessages]: true,
       });
     }
